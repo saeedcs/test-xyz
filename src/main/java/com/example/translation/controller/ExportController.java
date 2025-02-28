@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -17,8 +18,12 @@ public class ExportController {
     private ExportService exportService;
 
     @GetMapping("/translations")
-    public ResponseEntity<Map<String, Map<String, String>>> exportTranslations() {
+    public ResponseEntity<Map<String, String>> exportTranslations() {
+        Map<String, String> cdnUrls = new HashMap<>();
         Map<String, Map<String, String>> translations = exportService.exportTranslations();
-        return ResponseEntity.ok(translations);
+        for (String localeCode : translations.keySet()) {
+            cdnUrls.put(localeCode, exportService.generateCDNUrl(localeCode));
+        }
+        return ResponseEntity.ok(cdnUrls);
     }
 }
